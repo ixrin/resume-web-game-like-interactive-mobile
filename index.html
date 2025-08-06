@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Resume Quest - Interactive Portfolio</title>
+    <title>Resume Quest - Pokemon Style</title>
     <style>
         body {
             margin: 0;
@@ -18,16 +18,19 @@
             user-select: none;
             -webkit-user-select: none;
             -webkit-touch-callout: none;
+            overflow: hidden;
         }
         
         #gameContainer {
             position: relative;
             border: 4px solid #4a5568;
             background: #000;
-            border-radius: 8px;
+            border-radius: 12px;
             box-shadow: 0 0 20px rgba(74, 85, 104, 0.5);
-            max-width: 100vw;
-            max-height: 70vh;
+            width: 100vw;
+            height: 100vh;
+            max-width: 400px;
+            max-height: 100vh;
         }
         
         #gameCanvas {
@@ -35,403 +38,143 @@
             image-rendering: pixelated;
             image-rendering: -moz-crisp-edges;
             image-rendering: crisp-edges;
-            border-radius: 4px;
-            max-width: 100%;
-            max-height: 100%;
+            border-radius: 8px;
+            width: 100%;
+            height: 70%;
+            background: #000;
         }
         
         #dialogBox {
             position: absolute;
-            bottom: 15px;
-            left: 15px;
-            right: 15px;
-            background: rgba(0, 0, 0, 0.95);
-            border: 3px solid #fff;
-            border-radius: 8px;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: linear-gradient(135deg, #2a2a2a, #1a1a1a);
+            border: 4px solid #fff;
+            border-bottom: none;
+            border-radius: 12px 12px 0 0;
             color: #fff;
             padding: 20px;
-            font-size: 16px;
+            font-size: 14px;
             line-height: 1.6;
             display: none;
-            max-height: 250px;
+            height: 30%;
             overflow-y: auto;
-            box-shadow: 0 0 15px rgba(0, 0, 0, 0.8);
-            -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
+            box-shadow: 0 -4px 15px rgba(0, 0, 0, 0.8);
+            -webkit-overflow-scrolling: touch;
+            font-family: 'Courier New', monospace;
         }
         
         #dialogBox::-webkit-scrollbar {
-            width: 8px;
+            width: 12px;
         }
         
         #dialogBox::-webkit-scrollbar-track {
             background: rgba(255, 255, 255, 0.1);
-            border-radius: 4px;
+            border-radius: 6px;
         }
         
         #dialogBox::-webkit-scrollbar-thumb {
-            background: rgba(255, 255, 255, 0.3);
-            border-radius: 4px;
-        }
-        
-        #dialogBox::-webkit-scrollbar-thumb:hover {
-            background: rgba(255, 255, 255, 0.5);
-        }
-        
-        #closeDialogBtn {
-            position: absolute;
-            top: 10px;
-            right: 15px;
-            background: #ff6b35;
-            color: white;
-            border: none;
-            border-radius: 50%;
-            width: 30px;
-            height: 30px;
-            font-size: 16px;
-            font-weight: bold;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 1000;
-        }
-        
-        #closeDialogBtn:active {
-            background: #ff8b55;
-            transform: scale(0.95);
+            background: #4a90e2;
+            border-radius: 6px;
         }
         
         #instructions {
             position: absolute;
-            top: 15px;
-            left: 15px;
+            top: 10px;
+            left: 10px;
+            right: 10px;
             color: #fff;
-            font-size: 12px;
+            font-size: 11px;
             background: rgba(0, 0, 0, 0.8);
-            padding: 10px;
+            padding: 8px;
             border-radius: 6px;
             border: 2px solid #4a5568;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+            text-align: center;
             z-index: 100;
         }
         
-        #touchControls {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            margin-top: 20px;
-            gap: 20px;
-            flex-wrap: wrap;
-        }
-        
-        #dpad {
-            position: relative;
-            width: 140px;
-            height: 140px;
-            background: rgba(0, 0, 0, 0.3);
-            border-radius: 50%;
-            border: 2px solid #4a5568;
-        }
-        
-        .dpad-button {
-            position: absolute;
-            width: 50px;
-            height: 50px;
-            background: rgba(74, 85, 104, 0.8);
-            border: 2px solid #6a7b88;
-            border-radius: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
+        .pokemon-text {
+            color: #4a90e2;
             font-weight: bold;
-            font-size: 20px;
-            cursor: pointer;
-            user-select: none;
-            -webkit-user-select: none;
-            transition: all 0.1s;
         }
         
-        .dpad-button:active,
-        .dpad-button.pressed {
-            background: rgba(74, 85, 104, 1);
-            transform: scale(0.95);
-            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.3);
-        }
-        
-        #dpad-up {
-            top: 5px;
-            left: 45px;
-        }
-        
-        #dpad-down {
-            bottom: 5px;
-            left: 45px;
-        }
-        
-        #dpad-left {
-            top: 45px;
-            left: 5px;
-        }
-        
-        #dpad-right {
-            top: 45px;
-            right: 5px;
-        }
-        
-        #interactButton {
-            width: 100px;
-            height: 100px;
-            background: rgba(255, 107, 53, 0.8);
-            border: 3px solid #ff8b55;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
+        .dialog-name {
+            color: #ffd700;
             font-weight: bold;
-            font-size: 14px;
-            cursor: pointer;
-            user-select: none;
-            -webkit-user-select: none;
-            transition: all 0.1s;
-            text-align: center;
-            line-height: 1.2;
-        }
-        
-        #interactButton:active {
-            background: rgba(255, 107, 53, 1);
-            transform: scale(0.95);
-            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.3);
-        }
-        
-        /* Mobile responsive adjustments */
-        @media (max-width: 768px) {
-            body {
-                padding: 10px;
-            }
-            
-            #gameContainer {
-                width: 100%;
-                height: auto;
-                max-height: 60vh;
-            }
-            
-            #gameCanvas {
-                width: 100%;
-                height: auto;
-            }
-            
-            #instructions {
-                font-size: 10px;
-                padding: 8px;
-                top: 10px;
-                left: 10px;
-                max-width: calc(100% - 40px);
-            }
-            
-            #dialogBox {
-                font-size: 14px;
-                padding: 15px;
-                bottom: 10px;
-                left: 10px;
-                right: 10px;
-                max-height: 200px;
-            }
-            
-            #touchControls {
-                margin-top: 15px;
-                gap: 15px;
-            }
-            
-            #dpad {
-                width: 120px;
-                height: 120px;
-            }
-            
-            .dpad-button {
-                width: 40px;
-                height: 40px;
-                font-size: 18px;
-            }
-            
-            #dpad-up {
-                top: 5px;
-                left: 40px;
-            }
-            
-            #dpad-down {
-                bottom: 5px;
-                left: 40px;
-            }
-            
-            #dpad-left {
-                top: 40px;
-                left: 5px;
-            }
-            
-            #dpad-right {
-                top: 40px;
-                right: 5px;
-            }
-            
-            #interactButton {
-                width: 80px;
-                height: 80px;
-                font-size: 12px;
-            }
+            font-size: 16px;
+            margin-bottom: 10px;
         }
         
         @media (max-width: 480px) {
             #gameContainer {
-                max-height: 50vh;
+                border-radius: 0;
+                border: none;
+                width: 100vw;
+                height: 100vh;
             }
             
-            #touchControls {
-                flex-direction: column;
-                gap: 10px;
+            #instructions {
+                font-size: 10px;
+                padding: 6px;
+            }
+            
+            #dialogBox {
+                font-size: 13px;
+                padding: 15px;
             }
         }
     </style>
 </head>
 <body>
     <div id="gameContainer">
-        <canvas id="gameCanvas" width="1152" height="864"></canvas>
-        <div id="instructions">Use controls below to move • Touch to interact</div>
-        <div id="dialogBox" id="dialog">
-            <button id="closeDialogBtn">×</button>
-        </div>
-    </div>
-    
-    <div id="touchControls">
-        <div id="dpad">
-            <div id="dpad-up" class="dpad-button">↑</div>
-            <div id="dpad-down" class="dpad-button">↓</div>
-            <div id="dpad-left" class="dpad-button">←</div>
-            <div id="dpad-right" class="dpad-button">→</div>
-        </div>
-        <div id="interactButton">TALK</div>
+        <canvas id="gameCanvas" width="320" height="480"></canvas>
+        <div id="instructions">👆 Swipe to move • Touch NPCs to talk</div>
+        <div id="dialogBox"></div>
     </div>
 
     <script>
-        class Game {
+        class PokemonGame {
             constructor() {
                 this.canvas = document.getElementById('gameCanvas');
                 this.ctx = this.canvas.getContext('2d');
                 this.ctx.imageSmoothingEnabled = false;
                 
-                // Make canvas responsive
-                this.resizeCanvas();
-                window.addEventListener('resize', () => this.resizeCanvas());
-                
-                this.tileSize = 48;
-                this.characterSize = 42; // Increased from 32 to 42
-                this.mapWidth = 32;
-                this.mapHeight = 24;
+                // Portrait Pokemon-style dimensions
+                this.tileSize = 32; // Smaller tiles for more detail
+                this.characterSize = 32;
+                this.mapWidth = 20;
+                this.mapHeight = 30; // Taller for portrait
                 
                 this.player = {
-                    x: 8,
-                    y: 12,
-                    sprite: 0,
+                    x: 10,
+                    y: 15,
                     animFrame: 0,
-                    facing: 'down'
+                    facing: 'down',
+                    moving: false,
+                    moveProgress: 0
                 };
                 
                 this.camera = { x: 0, y: 0 };
-                this.keys = {};
-                this.touchKeys = {};
                 this.lastTime = 0;
                 this.animTimer = 0;
+                
+                // Touch controls
+                this.touchStart = { x: 0, y: 0 };
+                this.touchCurrent = { x: 0, y: 0 };
+                this.isTouching = false;
+                this.swipeThreshold = 30;
                 this.moveTimer = 0;
-                this.moveDelay = 200;
+                this.moveDelay = 150;
                 
                 this.dialogBox = document.getElementById('dialogBox');
-                this.closeDialogBtn = document.getElementById('closeDialogBtn');
                 this.showingDialog = false;
+                this.currentNPC = null;
                 
                 this.initializeMap();
                 this.initializeNPCs();
-                this.setupControls();
                 this.setupTouchControls();
                 this.gameLoop();
-            }
-            
-            resizeCanvas() {
-                const container = document.getElementById('gameContainer');
-                const canvas = this.canvas;
-                
-                const maxWidth = Math.min(window.innerWidth - 40, 1152);
-                const maxHeight = Math.min(window.innerHeight * 0.6, 864);
-                
-                const scaleX = maxWidth / 1152;
-                const scaleY = maxHeight / 864;
-                const scale = Math.min(scaleX, scaleY);
-                
-                canvas.style.width = (1152 * scale) + 'px';
-                canvas.style.height = (864 * scale) + 'px';
-                
-                container.style.width = (1152 * scale) + 'px';
-                container.style.height = (864 * scale) + 'px';
-            }
-            
-            setupTouchControls() {
-                const dpadUp = document.getElementById('dpad-up');
-                const dpadDown = document.getElementById('dpad-down');
-                const dpadLeft = document.getElementById('dpad-left');
-                const dpadRight = document.getElementById('dpad-right');
-                const interactButton = document.getElementById('interactButton');
-                
-                this.setupDirectionalButton(dpadUp, 'ArrowUp');
-                this.setupDirectionalButton(dpadDown, 'ArrowDown');
-                this.setupDirectionalButton(dpadLeft, 'ArrowLeft');
-                this.setupDirectionalButton(dpadRight, 'ArrowRight');
-                
-                this.setupInteractButton(interactButton);
-                
-                // Canvas touch for interaction
-                this.canvas.addEventListener('touchstart', (e) => {
-                    e.preventDefault();
-                    this.handleInteraction();
-                });
-                
-                this.canvas.addEventListener('contextmenu', (e) => {
-                    e.preventDefault();
-                });
-            }
-            
-            setupDirectionalButton(button, keyCode) {
-                const handleStart = (e) => {
-                    e.preventDefault();
-                    this.touchKeys[keyCode] = true;
-                    button.classList.add('pressed');
-                };
-                
-                const handleEnd = (e) => {
-                    e.preventDefault();
-                    this.touchKeys[keyCode] = false;
-                    button.classList.remove('pressed');
-                };
-                
-                button.addEventListener('mousedown', handleStart);
-                button.addEventListener('mouseup', handleEnd);
-                button.addEventListener('mouseleave', handleEnd);
-                
-                button.addEventListener('touchstart', handleStart);
-                button.addEventListener('touchend', handleEnd);
-                button.addEventListener('touchcancel', handleEnd);
-                
-                button.addEventListener('contextmenu', (e) => e.preventDefault());
-            }
-            
-            setupInteractButton(button) {
-                const handleInteract = (e) => {
-                    e.preventDefault();
-                    this.handleInteraction();
-                };
-                
-                button.addEventListener('touchstart', handleInteract);
-                button.addEventListener('mousedown', handleInteract);
-                button.addEventListener('contextmenu', (e) => e.preventDefault());
             }
             
             initializeMap() {
@@ -441,169 +184,184 @@
                     for (let x = 0; x < this.mapWidth; x++) {
                         if (y === 0 || y === this.mapHeight - 1 || x === 0 || x === this.mapWidth - 1) {
                             this.map[y][x] = 2; // Water border
-                        } else if (Math.random() < 0.1) {
-                            this.map[y][x] = 3; // Random trees
+                        } else if (Math.random() < 0.15) {
+                            this.map[y][x] = 3; // Trees
+                        } else if (Math.random() < 0.08) {
+                            this.map[y][x] = 1; // Rocks
                         } else if (Math.random() < 0.05) {
-                            this.map[y][x] = 1; // Random stones
+                            this.map[y][x] = 4; // Flowers
                         } else {
                             this.map[y][x] = 0; // Grass
                         }
                     }
                 }
                 
-                // Clear areas around NPCs and player
-                this.map[12][8] = 0;
-                this.map[10][15] = 0;
-                this.map[15][10] = 0;
-                this.map[8][20] = 0;
-                this.map[18][25] = 0;
+                // Clear spawn areas
+                for (let dy = -1; dy <= 1; dy++) {
+                    for (let dx = -1; dx <= 1; dx++) {
+                        if (this.player.x + dx >= 0 && this.player.x + dx < this.mapWidth &&
+                            this.player.y + dy >= 0 && this.player.y + dy < this.mapHeight) {
+                            this.map[this.player.y + dy][this.player.x + dx] = 0;
+                        }
+                    }
+                }
             }
             
             initializeNPCs() {
                 this.npcs = [
                     {
-                        x: 15, y: 10, sprite: 1, name: "Experience Keeper",
-                        dialog: "🏢 WORK EXPERIENCE\n\n• Project Coordinator\n  Deluxe Media Inc. - Managed subtitle and script projects for major entertainment companies including Amazon, Netflix, Disney, Lionsgate, MGM, Sony, Universal, and Warner. Improved team productivity while maintaining perfect on-time delivery.\n\n  -Collaborated with Creative, Order Management, Asset, Language Services, and Quality Control teams for smooth localization processes. Used Sfera platform to maintain quality standards and prevent client issues.\n\n -Streamlined cross-departmental workflows by managing linguist schedules, processing payments, and coordinating global team handovers. Resolved asset delays and vendor communication issues to keep projects on schedule."
+                        x: 5, y: 8, sprite: 1, name: "Prof. Experience",
+                        dialog: "🏢 WORK EXPERIENCE\n\n• Project Coordinator at Deluxe Media Inc.\n\nManaged subtitle and script projects for major entertainment companies including Amazon, Netflix, Disney, Lionsgate, MGM, Sony, Universal, and Warner.\n\n• Collaborated with Creative, Order Management, Asset, Language Services, and Quality Control teams for smooth localization processes.\n\n• Used Sfera platform to maintain quality standards and prevent client issues.\n\n• Streamlined cross-departmental workflows by managing linguist schedules, processing payments, and coordinating global team handovers."
                     },
                     {
-                        x: 10, y: 15, sprite: 2, name: "Skills Master",
-                        dialog: "⚡ Side-Projects/Awards\n\n🚀 Pokémon Essentials v13 Project:\n -Conceived an original region, storyline, and character set, applying a consistent pixel-art style and color palette.\n -Customized base assets in Pokémon Essentials: added new starters, balanced early-game encounter tables, and tweaked battle mechanics.\n\n🛠️ Game Boy Advance ROM Hacks:\n -De-compiled and rebuilt GBA ROMs, overhauling level layouts with AdvanceMap 1.92 and repointing tilesets to expand world size beyond vanilla limits.\n -Balanced custom regional Pokédex entries in YAPE 0.9, adjusting base stats, movesets, evolution data, and experience curves for competitive parity.\n -Re-scripted in-game events and added new items through open-source hex editors and community scripting tools (XSE, A-Text), learning memory offsets and pointer tables\n\n☁️ Award:\n -Robotics Camp Winner - First Edition (Science Centre, Mizoram)"
+                        x: 14, y: 12, sprite: 2, name: "Skill Master",
+                        dialog: "⚡ SKILLS & PROJECTS\n\n🚀 Pokémon Essentials v13 Project:\n• Conceived original region, storyline, and character set\n• Applied consistent pixel-art style and color palette\n• Customized base assets with new starters\n• Balanced early-game encounter tables\n\n🛠️ Game Boy Advance ROM Hacks:\n• De-compiled and rebuilt GBA ROMs\n• Overhauled level layouts with AdvanceMap 1.92\n• Repointed tilesets to expand world size\n• Balanced custom regional Pokédex entries\n• Re-scripted in-game events\n\n🏆 Award: Robotics Camp Winner - First Edition"
                     },
                     {
-                        x: 20, y: 8, sprite: 3, name: "Education Sage",
-                        dialog: "🎓 EDUCATION & CERTIFICATIONS\n\n📚 Bachelor of Technology (Computer Science & Engineering\nNIT Mizoram\n\nPositions: State Co-Convener of Think India: Mizoram, Event Host/Emcee/Anchor, Assistant Sports Secretary\n\n🏆 Certifications:\n• Ethical Hacking and Penetration Testing (CDAC, Noida)\n• Foundation Program on Nano Science and Technology (IISc Bengaluru)\n\n🌟 Projects:\n• College Healthcare Facilities: Enhanced accessibility and quality of healthcare for college students through a website providing information on medical services, enabling appointment booking, online consultations, and feedback submission, alongside managing health records and statistics."
+                        x: 8, y: 20, sprite: 3, name: "Dean Scholar",
+                        dialog: "🎓 EDUCATION & CERTIFICATIONS\n\n📚 Bachelor of Technology\nComputer Science & Engineering\nNIT Mizoram\n\n👥 Leadership Positions:\n• State Co-Convener of Think India: Mizoram\n• Event Host/Emcee/Anchor\n• Assistant Sports Secretary\n\n🏆 Certifications:\n• Ethical Hacking and Penetration Testing (CDAC, Noida)\n• Foundation Program on Nano Science and Technology (IISc Bengaluru)\n\n🌟 College Healthcare Facilities Project:\nEnhanced accessibility and quality of healthcare for college students through comprehensive website platform."
                     },
                     {
-                        x: 25, y: 18, sprite: 4, name: "Contact Oracle",
-                        dialog: "📬 GET IN TOUCH\n\n📧 Email: ixrindika@gmail.com\n🔗 LinkedIn: linkedin.com/in/rindika"
+                        x: 15, y: 25, sprite: 4, name: "Contact Sage",
+                        dialog: "📬 GET IN TOUCH\n\n📧 Email: ixrindika@gmail.com\n🔗 LinkedIn: linkedin.com/in/rindika\n\n🌟 Ready for new opportunities and collaborations!\n\nFeel free to reach out for:\n• Project collaborations\n• Job opportunities\n• Technical discussions\n• Gaming projects"
                     }
                 ];
-            }
-            
-            setupControls() {
-                document.addEventListener('keydown', (e) => {
-                    this.keys[e.code] = true;
-                    if (e.code === 'Space') {
-                        e.preventDefault();
-                        this.handleInteraction();
+                
+                // Clear NPC spawn areas
+                this.npcs.forEach(npc => {
+                    for (let dy = -1; dy <= 1; dy++) {
+                        for (let dx = -1; dx <= 1; dx++) {
+                            if (npc.x + dx >= 0 && npc.x + dx < this.mapWidth &&
+                                npc.y + dy >= 0 && npc.y + dy < this.mapHeight) {
+                                this.map[npc.y + dy][npc.x + dx] = 0;
+                            }
+                        }
                     }
                 });
-                
-                document.addEventListener('keyup', (e) => {
-                    this.keys[e.code] = false;
-                });
-                
-                // Close dialog button
-                this.closeDialogBtn.addEventListener('click', () => {
-                    this.hideDialog();
-                });
-                
-                this.closeDialogBtn.addEventListener('touchstart', (e) => {
-                    e.preventDefault();
-                    this.hideDialog();
-                });
-                
-                // Remove click-to-close on dialog content area
-                // Now only the X button closes the dialog
             }
             
-            handleInteraction() {
-                if (this.showingDialog) {
-                    this.hideDialog();
-                    return;
-                }
+            setupTouchControls() {
+                // Touch movement
+                this.canvas.addEventListener('touchstart', (e) => {
+                    e.preventDefault();
+                    const touch = e.touches[0];
+                    const rect = this.canvas.getBoundingClientRect();
+                    const scaleX = this.canvas.width / rect.width;
+                    const scaleY = this.canvas.height / rect.height;
+                    
+                    this.touchStart.x = (touch.clientX - rect.left) * scaleX;
+                    this.touchStart.y = (touch.clientY - rect.top) * scaleY;
+                    this.touchCurrent.x = this.touchStart.x;
+                    this.touchCurrent.y = this.touchStart.y;
+                    this.isTouching = true;
+                    
+                    // Check for NPC touch
+                    this.checkNPCTouch(this.touchStart.x, this.touchStart.y);
+                });
                 
+                this.canvas.addEventListener('touchmove', (e) => {
+                    e.preventDefault();
+                    if (!this.isTouching || this.showingDialog) return;
+                    
+                    const touch = e.touches[0];
+                    const rect = this.canvas.getBoundingClientRect();
+                    const scaleX = this.canvas.width / rect.width;
+                    const scaleY = this.canvas.height / rect.height;
+                    
+                    this.touchCurrent.x = (touch.clientX - rect.left) * scaleX;
+                    this.touchCurrent.y = (touch.clientY - rect.top) * scaleY;
+                    
+                    this.handleSwipeMovement();
+                });
+                
+                this.canvas.addEventListener('touchend', (e) => {
+                    e.preventDefault();
+                    this.isTouching = false;
+                    this.player.moving = false;
+                });
+                
+                // Dialog touch scrolling (keep dialog open)
+                this.dialogBox.addEventListener('touchstart', (e) => {
+                    e.stopPropagation(); // Prevent closing
+                });
+                
+                this.dialogBox.addEventListener('touchmove', (e) => {
+                    e.stopPropagation(); // Allow scrolling
+                });
+                
+                // Close dialog with tap outside
+                document.addEventListener('touchstart', (e) => {
+                    if (this.showingDialog && !this.dialogBox.contains(e.target)) {
+                        this.hideDialog();
+                    }
+                });
+            }
+            
+            checkNPCTouch(touchX, touchY) {
                 for (let npc of this.npcs) {
-                    const distance = Math.abs(this.player.x - npc.x) + Math.abs(this.player.y - npc.y);
-                    if (distance <= 1) {
-                        this.showDialog(npc.dialog);
+                    const npcScreenX = npc.x * this.tileSize - this.camera.x;
+                    const npcScreenY = npc.y * this.tileSize - this.camera.y;
+                    
+                    if (touchX >= npcScreenX && touchX <= npcScreenX + this.tileSize &&
+                        touchY >= npcScreenY && touchY <= npcScreenY + this.tileSize) {
+                        this.showDialog(npc);
                         return;
                     }
                 }
             }
             
-            showDialog(text) {
-                this.dialogBox.innerHTML = '<button id="closeDialogBtn">×</button>' + text.replace(/\n/g, '<br>');
-                
-                // Re-attach close button event
-                const newCloseBtn = document.getElementById('closeDialogBtn');
-                newCloseBtn.addEventListener('click', () => this.hideDialog());
-                newCloseBtn.addEventListener('touchstart', (e) => {
-                    e.preventDefault();
-                    this.hideDialog();
-                });
-                
-                this.dialogBox.style.display = 'block';
-                this.showingDialog = true;
-            }
-            
-            hideDialog() {
-                this.dialogBox.style.display = 'none';
-                this.showingDialog = false;
-            }
-            
-            update(deltaTime) {
+            handleSwipeMovement() {
                 if (this.showingDialog) return;
                 
-                this.animTimer += deltaTime;
-                this.moveTimer += deltaTime;
+                const deltaX = this.touchCurrent.x - this.touchStart.x;
+                const deltaY = this.touchCurrent.y - this.touchStart.y;
                 
-                if (this.animTimer > 500) {
-                    this.player.animFrame = (this.player.animFrame + 1) % 2;
-                    this.animTimer = 0;
-                }
+                if (Math.abs(deltaX) < this.swipeThreshold && Math.abs(deltaY) < this.swipeThreshold) return;
                 
                 let newX = this.player.x;
                 let newY = this.player.y;
-                let moving = false;
+                let moved = false;
                 
-                if (this.moveTimer >= this.moveDelay) {
-                    if (this.keys['KeyW'] || this.keys['ArrowUp'] || this.touchKeys['ArrowUp']) {
-                        newY--;
-                        this.player.facing = 'up';
-                        moving = true;
-                        this.moveTimer = 0;
-                    }
-                    if (this.keys['KeyS'] || this.keys['ArrowDown'] || this.touchKeys['ArrowDown']) {
-                        newY++;
-                        this.player.facing = 'down';
-                        moving = true;
-                        this.moveTimer = 0;
-                    }
-                    if (this.keys['KeyA'] || this.keys['ArrowLeft'] || this.touchKeys['ArrowLeft']) {
-                        newX--;
-                        this.player.facing = 'left';
-                        moving = true;
-                        this.moveTimer = 0;
-                    }
-                    if (this.keys['KeyD'] || this.keys['ArrowRight'] || this.touchKeys['ArrowRight']) {
+                if (Math.abs(deltaX) > Math.abs(deltaY)) {
+                    // Horizontal movement
+                    if (deltaX > this.swipeThreshold) {
                         newX++;
                         this.player.facing = 'right';
-                        moving = true;
-                        this.moveTimer = 0;
+                        moved = true;
+                    } else if (deltaX < -this.swipeThreshold) {
+                        newX--;
+                        this.player.facing = 'left';
+                        moved = true;
+                    }
+                } else {
+                    // Vertical movement
+                    if (deltaY > this.swipeThreshold) {
+                        newY++;
+                        this.player.facing = 'down';
+                        moved = true;
+                    } else if (deltaY < -this.swipeThreshold) {
+                        newY--;
+                        this.player.facing = 'up';
+                        moved = true;
                     }
                 }
                 
-                if (moving && this.canMoveTo(newX, newY)) {
+                if (moved && this.canMoveTo(newX, newY)) {
                     this.player.x = newX;
                     this.player.y = newY;
+                    this.player.moving = true;
+                    
+                    // Reset touch start for continuous movement
+                    this.touchStart.x = this.touchCurrent.x;
+                    this.touchStart.y = this.touchCurrent.y;
                 }
-                
-                if (!moving) {
-                    this.player.animFrame = 0;
-                }
-                
-                this.camera.x = Math.max(0, Math.min(this.player.x * this.tileSize - this.canvas.width / 2, 
-                    this.mapWidth * this.tileSize - this.canvas.width));
-                this.camera.y = Math.max(0, Math.min(this.player.y * this.tileSize - this.canvas.height / 2, 
-                    this.mapHeight * this.tileSize - this.canvas.height));
             }
             
             canMoveTo(x, y) {
                 if (x < 0 || x >= this.mapWidth || y < 0 || y >= this.mapHeight) return false;
                 
                 const tile = this.map[y][x];
-                if (tile === 2 || tile === 3) return false;
+                if (tile === 2 || tile === 3) return false; // Water or trees
                 
                 for (let npc of this.npcs) {
                     if (npc.x === x && npc.y === y) return false;
@@ -612,9 +370,41 @@
                 return true;
             }
             
+            showDialog(npc) {
+                this.currentNPC = npc;
+                this.dialogBox.innerHTML = `
+                    <div class="dialog-name">${npc.name}</div>
+                    ${npc.dialog.replace(/\n/g, '<br>')}
+                `;
+                this.dialogBox.style.display = 'block';
+                this.showingDialog = true;
+            }
+            
+            hideDialog() {
+                this.dialogBox.style.display = 'none';
+                this.showingDialog = false;
+                this.currentNPC = null;
+            }
+            
+            update(deltaTime) {
+                this.animTimer += deltaTime;
+                
+                if (this.animTimer > 400) {
+                    this.player.animFrame = (this.player.animFrame + 1) % 4;
+                    this.animTimer = 0;
+                }
+                
+                // Update camera to follow player (portrait style)
+                this.camera.x = Math.max(0, Math.min(this.player.x * this.tileSize - this.canvas.width / 2, 
+                    this.mapWidth * this.tileSize - this.canvas.width));
+                this.camera.y = Math.max(0, Math.min(this.player.y * this.tileSize - this.canvas.height / 2, 
+                    this.mapHeight * this.tileSize - this.canvas.height));
+            }
+            
             render() {
                 this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
                 
+                // Render map
                 for (let y = 0; y < this.mapHeight; y++) {
                     for (let x = 0; x < this.mapWidth; x++) {
                         const screenX = x * this.tileSize - this.camera.x;
@@ -627,302 +417,248 @@
                     }
                 }
                 
+                // Render NPCs
                 for (let npc of this.npcs) {
                     const screenX = npc.x * this.tileSize - this.camera.x;
                     const screenY = npc.y * this.tileSize - this.camera.y;
-                    this.drawSprite(npc.sprite, screenX, screenY);
-                    
-                    const distance = Math.abs(this.player.x - npc.x) + Math.abs(this.player.y - npc.y);
-                    if (distance <= 1) {
-                        this.ctx.fillStyle = '#ffff00';
-                        this.ctx.fillRect(screenX + 18, screenY - 10, 16, 10);
-                        this.ctx.fillStyle = '#ffffff';
-                        this.ctx.fillRect(screenX + 20, screenY - 8, 12, 6);
-                    }
+                    this.drawNPC(npc.sprite, screenX, screenY);
                 }
                 
+                // Render player
                 const playerScreenX = this.player.x * this.tileSize - this.camera.x;
                 const playerScreenY = this.player.y * this.tileSize - this.camera.y;
                 this.drawPlayer(playerScreenX, playerScreenY);
             }
             
             drawTile(tileType, x, y) {
-                const size = this.tileSize;
+                const s = this.tileSize;
                 
                 switch (tileType) {
-                    case 0: // Grass
-                        this.ctx.fillStyle = '#2a5a1a';
-                        this.ctx.fillRect(x, y, size, size);
+                    case 0: // Pokemon-style grass
+                        // Base grass
+                        this.ctx.fillStyle = '#3a7c17';
+                        this.ctx.fillRect(x, y, s, s);
                         
-                        this.ctx.fillStyle = '#3a6b2a';
-                        this.ctx.fillRect(x + 6, y + 6, 12, 12);
-                        this.ctx.fillRect(x + 30, y + 24, 9, 9);
-                        this.ctx.fillRect(x + 12, y + 36, 6, 6);
+                        // Grass pattern
+                        this.ctx.fillStyle = '#4a8c27';
+                        this.ctx.fillRect(x + 2, y + 2, 6, 6);
+                        this.ctx.fillRect(x + 16, y + 8, 6, 6);
+                        this.ctx.fillRect(x + 8, y + 20, 6, 6);
+                        this.ctx.fillRect(x + 24, y + 24, 6, 6);
                         
-                        this.ctx.fillStyle = '#4a7c3a';
-                        this.ctx.fillRect(x + 8, y + 8, 8, 8);
-                        this.ctx.fillRect(x + 32, y + 26, 6, 6);
-                        this.ctx.fillRect(x + 20, y + 16, 4, 8);
-                        
-                        this.ctx.fillStyle = '#5a8c4a';
-                        this.ctx.fillRect(x + 10, y + 10, 2, 8);
-                        this.ctx.fillRect(x + 34, y + 28, 2, 6);
-                        this.ctx.fillRect(x + 24, y + 20, 2, 6);
-                        this.ctx.fillRect(x + 15, y + 38, 2, 4);
-                        this.ctx.fillRect(x + 6, y + 24, 2, 6);
-                        this.ctx.fillRect(x + 40, y + 12, 2, 4);
+                        // Grass details
+                        this.ctx.fillStyle = '#5a9c37';
+                        this.ctx.fillRect(x + 4, y + 4, 2, 8);
+                        this.ctx.fillRect(x + 18, y + 10, 2, 6);
+                        this.ctx.fillRect(x + 10, y + 22, 2, 6);
+                        this.ctx.fillRect(x + 26, y + 26, 2, 4);
                         break;
                         
-                    case 1: // Stone (made larger and more prominent)
-                        this.ctx.fillStyle = '#3a3a3a';
-                        this.ctx.fillRect(x, y, size, size);
+                    case 1: // Pokemon-style rocks
+                        this.ctx.fillStyle = '#2a2a2a';
+                        this.ctx.fillRect(x, y, s, s);
                         
                         this.ctx.fillStyle = '#4a4a4a';
-                        this.ctx.fillRect(x + 2, y + 2, size - 4, size - 4);
+                        this.ctx.fillRect(x + 2, y + 2, s - 4, s - 4);
                         
                         this.ctx.fillStyle = '#6a6a6a';
-                        this.ctx.fillRect(x + 4, y + 4, size - 8, 16);
-                        this.ctx.fillRect(x + 4, y + 26, 24, 8);
-                        this.ctx.fillRect(x + 28, y + 28, 16, 16);
+                        this.ctx.fillRect(x + 4, y + 4, s - 8, 8);
+                        this.ctx.fillRect(x + 4, y + 16, 12, 8);
                         
                         this.ctx.fillStyle = '#8a8a8a';
-                        this.ctx.fillRect(x + 6, y + 6, size - 12, 12);
-                        this.ctx.fillRect(x + 6, y + 28, 20, 6);
-                        this.ctx.fillRect(x + 30, y + 30, 12, 12);
-                        
-                        this.ctx.fillStyle = '#2a2a2a';
-                        this.ctx.fillRect(x + size - 4, y + 4, 4, size - 4);
-                        this.ctx.fillRect(x + 4, y + size - 4, size - 8, 4);
+                        this.ctx.fillRect(x + 6, y + 6, s - 12, 4);
+                        this.ctx.fillRect(x + 6, y + 18, 8, 4);
                         break;
                         
-                    case 2: // Water
-                        this.ctx.fillStyle = '#0a3a7a';
-                        this.ctx.fillRect(x, y, size, size);
+                    case 2: // Pokemon-style water
+                        this.ctx.fillStyle = '#1e3a8a';
+                        this.ctx.fillRect(x, y, s, s);
                         
-                        this.ctx.fillStyle = '#1a4a8a';
-                        this.ctx.fillRect(x + 3, y + 3, size - 6, size - 6);
+                        this.ctx.fillStyle = '#2563eb';
+                        this.ctx.fillRect(x + 2, y + 2, s - 4, s - 4);
                         
-                        this.ctx.fillStyle = '#2a5a9a';
-                        this.ctx.fillRect(x + 6, y + 6, size - 12, size - 12);
+                        this.ctx.fillStyle = '#3b82f6';
+                        this.ctx.fillRect(x + 4, y + 4, s - 8, s - 8);
                         
-                        this.ctx.fillStyle = '#3a6aaa';
-                        this.ctx.fillRect(x + 8, y + 8, 18, 6);
-                        this.ctx.fillRect(x + 24, y + 24, 12, 6);
-                        this.ctx.fillRect(x + 12, y + 36, 9, 4);
-                        
-                        this.ctx.fillStyle = '#4a7aba';
-                        this.ctx.fillRect(x + 10, y + 10, 3, 3);
-                        this.ctx.fillRect(x + 26, y + 26, 3, 3);
-                        this.ctx.fillRect(x + 36, y + 12, 3, 3);
-                        this.ctx.fillRect(x + 14, y + 38, 2, 2);
+                        // Water sparkles
+                        this.ctx.fillStyle = '#60a5fa';
+                        this.ctx.fillRect(x + 8, y + 8, 3, 3);
+                        this.ctx.fillRect(x + 20, y + 16, 3, 3);
+                        this.ctx.fillRect(x + 12, y + 22, 2, 2);
                         break;
                         
-                    case 3: // Tree (made much larger and more imposing)
-                        this.ctx.fillStyle = '#2a5a1a';
-                        this.ctx.fillRect(x, y, size, size);
+                    case 3: // Pokemon-style trees
+                        // Grass base
+                        this.ctx.fillStyle = '#3a7c17';
+                        this.ctx.fillRect(x, y, s, s);
                         
-                        // Much thicker trunk
-                        this.ctx.fillStyle = '#5b3a1a';
-                        this.ctx.fillRect(x + 14, y + 28, 20, 20);
+                        // Tree trunk
+                        this.ctx.fillStyle = '#8b4513';
+                        this.ctx.fillRect(x + 12, y + 20, 8, 12);
                         
-                        this.ctx.fillStyle = '#7b4a2a';
-                        this.ctx.fillRect(x + 16, y + 30, 16, 16);
+                        this.ctx.fillStyle = '#a0522d';
+                        this.ctx.fillRect(x + 14, y + 22, 4, 8);
                         
-                        this.ctx.fillStyle = '#6b4423';
-                        this.ctx.fillRect(x + 18, y + 32, 4, 14);
-                        this.ctx.fillRect(x + 26, y + 34, 4, 12);
+                        // Tree crown
+                        this.ctx.fillStyle = '#15803d';
+                        this.ctx.fillRect(x + 4, y + 4, 24, 20);
                         
-                        // Much larger tree crown
-                        this.ctx.fillStyle = '#1a6b1a';
-                        this.ctx.fillRect(x + 2, y + 2, 44, 38);
+                        this.ctx.fillStyle = '#16a34a';
+                        this.ctx.fillRect(x + 6, y + 6, 20, 4);
+                        this.ctx.fillRect(x + 8, y + 12, 16, 4);
+                        this.ctx.fillRect(x + 10, y + 16, 12, 4);
                         
-                        this.ctx.fillStyle = '#228b22';
-                        this.ctx.fillRect(x + 6, y + 6, 36, 8);
-                        this.ctx.fillRect(x + 8, y + 16, 32, 8);
-                        this.ctx.fillRect(x + 10, y + 26, 28, 8);
+                        this.ctx.fillStyle = '#22c55e';
+                        this.ctx.fillRect(x + 8, y + 8, 4, 12);
+                        this.ctx.fillRect(x + 20, y + 10, 4, 8);
+                        break;
                         
-                        this.ctx.fillStyle = '#32ab32';
-                        this.ctx.fillRect(x + 8, y + 8, 10, 24);
-                        this.ctx.fillRect(x + 30, y + 12, 10, 16);
-                        this.ctx.fillRect(x + 19, y + 18, 10, 14);
+                    case 4: // Pokemon-style flowers
+                        // Grass base
+                        this.ctx.fillStyle = '#3a7c17';
+                        this.ctx.fillRect(x, y, s, s);
                         
-                        this.ctx.fillStyle = '#0a5a0a';
-                        this.ctx.fillRect(x + 32, y + 8, 12, 28);
-                        this.ctx.fillRect(x + 8, y + 32, 32, 8);
+                        // Flower stem
+                        this.ctx.fillStyle = '#22c55e';
+                        this.ctx.fillRect(x + 14, y + 16, 4, 12);
+                        
+                        // Flower petals
+                        this.ctx.fillStyle = '#f59e0b';
+                        this.ctx.fillRect(x + 12, y + 8, 8, 8);
+                        
+                        this.ctx.fillStyle = '#fbbf24';
+                        this.ctx.fillRect(x + 14, y + 10, 4, 4);
                         break;
                 }
             }
             
             drawPlayer(x, y) {
-                // Center character in tile with new larger size
-                const offsetX = (this.tileSize - this.characterSize) / 2;
-                const offsetY = this.tileSize - this.characterSize;
-                x += offsetX;
-                y += offsetY;
-                
-                // Character shadow
+                // Shadow
                 this.ctx.fillStyle = 'rgba(0, 0, 0, 0.3)';
-                this.ctx.fillRect(x + 6, y + this.characterSize - 2, 30, 4);
+                this.ctx.fillRect(x + 4, y + 28, 24, 4);
                 
-                // Cat body (larger)
-                this.ctx.fillStyle = '#ff6b35';
-                this.ctx.fillRect(x + 8, y + 14, 26, 24);
+                // Pokemon trainer style
+                // Body
+                this.ctx.fillStyle = '#dc2626'; // Red shirt
+                this.ctx.fillRect(x + 8, y + 16, 16, 12);
                 
-                // Body highlights
-                this.ctx.fillStyle = '#ff8b55';
-                this.ctx.fillRect(x + 12, y + 18, 18, 6);
+                // Arms
+                this.ctx.fillStyle = '#fbbf24'; // Skin tone
+                this.ctx.fillRect(x + 4, y + 18, 6, 8);
+                this.ctx.fillRect(x + 22, y + 18, 6, 8);
                 
-                // Cat head (larger)
-                this.ctx.fillStyle = '#ff6b35';
-                this.ctx.fillRect(x + 11, y + 2, 20, 18);
+                // Pants
+                this.ctx.fillStyle = '#1e40af'; // Blue pants
+                this.ctx.fillRect(x + 10, y + 24, 12, 8);
                 
-                // Head highlights
-                this.ctx.fillStyle = '#ff8b55';
-                this.ctx.fillRect(x + 15, y + 6, 12, 6);
+                // Head
+                this.ctx.fillStyle = '#fbbf24'; // Skin
+                this.ctx.fillRect(x + 8, y + 4, 16, 12);
                 
-                // Cat ears (larger)
-                this.ctx.fillStyle = '#ff6b35';
-                this.ctx.fillRect(x + 8, y, 6, 8);
-                this.ctx.fillRect(x + 28, y, 6, 8);
+                // Hair
+                this.ctx.fillStyle = '#8b5cf6'; // Purple hair
+                this.ctx.fillRect(x + 8, y + 2, 16, 6);
                 
-                // Inner ears
-                this.ctx.fillStyle = '#ff8b55';
-                this.ctx.fillRect(x + 10, y + 2, 3, 4);
-                this.ctx.fillRect(x + 29, y + 2, 3, 4);
+                // Hat
+                this.ctx.fillStyle = '#dc2626'; // Red hat
+                this.ctx.fillRect(x + 6, y, 20, 6);
                 
-                // Cat eyes (larger)
+                // Eyes
                 this.ctx.fillStyle = '#000';
-                this.ctx.fillRect(x + 15, y + 9, 3, 3);
-                this.ctx.fillRect(x + 24, y + 9, 3, 3);
+                this.ctx.fillRect(x + 12, y + 8, 2, 2);
+                this.ctx.fillRect(x + 18, y + 8, 2, 2);
                 
-                // Eye shine
-                this.ctx.fillStyle = '#fff';
-                this.ctx.fillRect(x + 16, y + 9, 1, 1);
-                this.ctx.fillRect(x + 25, y + 9, 1, 1);
-                
-                // Cat nose
-                this.ctx.fillStyle = '#000';
-                this.ctx.fillRect(x + 19, y + 14, 4, 2);
-                
-                // Cat tail (animated, larger)
-                const tailOffset = this.player.animFrame === 0 ? 0 : 3;
-                this.ctx.fillStyle = '#ff6b35';
-                this.ctx.fillRect(x + 34 + tailOffset, y + 20, 6, 12);
-                
-                // Tail highlight
-                this.ctx.fillStyle = '#ff8b55';
-                this.ctx.fillRect(x + 35 + tailOffset, y + 22, 4, 8);
-                
-                // Movement animation - paws (larger)
-                if (this.player.animFrame === 1) {
-                    this.ctx.fillStyle = '#ff6b35';
-                    this.ctx.fillRect(x + 2, y + 36, 6, 6); // Left paw
-                    this.ctx.fillRect(x + 34, y + 36, 6, 6); // Right paw
-                    
-                    // Paw pads
+                // Walking animation
+                if (this.player.moving && this.player.animFrame % 2 === 1) {
+                    // Left foot forward
                     this.ctx.fillStyle = '#000';
-                    this.ctx.fillRect(x + 3, y + 37, 3, 3);
-                    this.ctx.fillRect(x + 35, y + 37, 3, 3);
+                    this.ctx.fillRect(x + 8, y + 30, 4, 2);
+                    this.ctx.fillRect(x + 20, y + 28, 4, 2);
+                } else {
+                    // Normal stance
+                    this.ctx.fillStyle = '#000';
+                    this.ctx.fillRect(x + 10, y + 30, 4, 2);
+                    this.ctx.fillRect(x + 18, y + 30, 4, 2);
                 }
             }
             
-            drawSprite(spriteType, x, y) {
-                // Center character in tile with new larger size
-                const offsetX = (this.tileSize - this.characterSize) / 2;
-                const offsetY = this.tileSize - this.characterSize;
-                x += offsetX;
-                y += offsetY;
-                
-                // Character shadow
+            drawNPC(spriteType, x, y) {
+                // Shadow
                 this.ctx.fillStyle = 'rgba(0, 0, 0, 0.3)';
-                this.ctx.fillRect(x + 6, y + this.characterSize - 2, 30, 4);
+                this.ctx.fillRect(x + 4, y + 28, 24, 4);
                 
                 switch (spriteType) {
-                    case 1: // Experience Keeper (Blue wizard) - larger
-                        this.ctx.fillStyle = '#2a4a9a';
-                        this.ctx.fillRect(x + 8, y + 8, 26, 30);
+                    case 1: // Prof. Experience (Lab coat)
+                        this.ctx.fillStyle = '#ffffff'; // White lab coat
+                        this.ctx.fillRect(x + 6, y + 12, 20, 16);
                         
-                        this.ctx.fillStyle = '#4169e1';
-                        this.ctx.fillRect(x + 12, y + 12, 18, 24);
+                        this.ctx.fillStyle = '#fbbf24'; // Skin
+                        this.ctx.fillRect(x + 8, y + 4, 16, 12);
                         
-                        this.ctx.fillStyle = '#fdbcb4';
-                        this.ctx.fillRect(x + 12, y + 2, 18, 12);
+                        this.ctx.fillStyle = '#6b7280'; // Gray hair
+                        this.ctx.fillRect(x + 8, y + 2, 16, 6);
                         
-                        this.ctx.fillStyle = '#2a4a9a';
-                        this.ctx.fillRect(x + 15, y - 2, 12, 8);
-                        
-                        this.ctx.fillStyle = '#4169e1';
-                        this.ctx.fillRect(x + 16, y - 1, 10, 6);
-                        
-                        this.ctx.fillStyle = '#8b4513';
-                        this.ctx.fillRect(x + 8, y + 22, 26, 4);
+                        this.ctx.fillStyle = '#000'; // Eyes
+                        this.ctx.fillRect(x + 12, y + 8, 2, 2);
+                        this.ctx.fillRect(x + 18, y + 8, 2, 2);
                         break;
                         
-                    case 2: // Skills Master (Green) - larger
-                        this.ctx.fillStyle = '#228b22';
-                        this.ctx.fillRect(x + 8, y + 8, 26, 30);
+                    case 2: // Skill Master (Green outfit)
+                        this.ctx.fillStyle = '#16a34a'; // Green
+                        this.ctx.fillRect(x + 8, y + 12, 16, 16);
                         
-                        this.ctx.fillStyle = '#32cd32';
-                        this.ctx.fillRect(x + 12, y + 12, 18, 24);
+                        this.ctx.fillStyle = '#fbbf24'; // Skin
+                        this.ctx.fillRect(x + 8, y + 4, 16, 12);
                         
-                        this.ctx.fillStyle = '#fdbcb4';
-                        this.ctx.fillRect(x + 12, y + 2, 18, 12);
+                        this.ctx.fillStyle = '#8b4513'; // Brown hair
+                        this.ctx.fillRect(x + 8, y + 2, 16, 6);
                         
-                        this.ctx.fillStyle = '#6b4423';
-                        this.ctx.fillRect(x + 15, y - 1, 12, 6);
-                        
-                        this.ctx.fillStyle = '#8b5433';
-                        this.ctx.fillRect(x + 16, y, 10, 4);
+                        this.ctx.fillStyle = '#000'; // Eyes
+                        this.ctx.fillRect(x + 12, y + 8, 2, 2);
+                        this.ctx.fillRect(x + 18, y + 8, 2, 2);
                         break;
                         
-                    case 3: // Education Sage (Purple) - larger
-                        this.ctx.fillStyle = '#663399';
-                        this.ctx.fillRect(x + 8, y + 8, 26, 30);
+                    case 3: // Dean Scholar (Purple robe)
+                        this.ctx.fillStyle = '#7c3aed'; // Purple
+                        this.ctx.fillRect(x + 6, y + 12, 20, 16);
                         
-                        this.ctx.fillStyle = '#9370db';
-                        this.ctx.fillRect(x + 12, y + 12, 18, 24);
+                        this.ctx.fillStyle = '#fbbf24'; // Skin
+                        this.ctx.fillRect(x + 8, y + 4, 16, 12);
                         
-                        this.ctx.fillStyle = '#fdbcb4';
-                        this.ctx.fillRect(x + 12, y + 2, 18, 12);
+                        this.ctx.fillStyle = '#000'; // Black hair
+                        this.ctx.fillRect(x + 8, y + 2, 16, 6);
                         
-                        this.ctx.fillStyle = '#b8860b';
-                        this.ctx.fillRect(x + 10, y - 2, 22, 6);
+                        this.ctx.fillStyle = '#fbbf24'; // Crown
+                        this.ctx.fillRect(x + 10, y, 12, 4);
                         
-                        this.ctx.fillStyle = '#daa520';
-                        this.ctx.fillRect(x + 12, y - 1, 18, 4);
+                        this.ctx.fillStyle = '#000'; // Eyes
+                        this.ctx.fillRect(x + 12, y + 8, 2, 2);
+                        this.ctx.fillRect(x + 18, y + 8, 2, 2);
                         break;
                         
-                    case 4: // Contact Oracle (Red) - larger
-                        this.ctx.fillStyle = '#aa1a1a';
-                        this.ctx.fillRect(x + 8, y + 8, 26, 30);
+                    case 4: // Contact Sage (Orange outfit)
+                        this.ctx.fillStyle = '#f59e0b'; // Orange
+                        this.ctx.fillRect(x + 8, y + 12, 16, 16);
                         
-                        this.ctx.fillStyle = '#dc143c';
-                        this.ctx.fillRect(x + 12, y + 12, 18, 24);
+                        this.ctx.fillStyle = '#fbbf24'; // Skin
+                        this.ctx.fillRect(x + 8, y + 4, 16, 12);
                         
-                        this.ctx.fillStyle = '#fdbcb4';
-                        this.ctx.fillRect(x + 12, y + 2, 18, 12);
+                        this.ctx.fillStyle = '#dc2626'; // Red hair
+                        this.ctx.fillRect(x + 8, y + 2, 16, 6);
                         
-                        this.ctx.fillStyle = '#aa1a1a';
-                        this.ctx.fillRect(x + 8, y - 2, 26, 8);
-                        
-                        this.ctx.fillStyle = '#dc143c';
-                        this.ctx.fillRect(x + 12, y - 1, 18, 6);
+                        this.ctx.fillStyle = '#000'; // Eyes
+                        this.ctx.fillRect(x + 12, y + 8, 2, 2);
+                        this.ctx.fillRect(x + 18, y + 8, 2, 2);
                         break;
                 }
                 
-                // Eyes for all NPCs (larger)
-                this.ctx.fillStyle = '#000';
-                this.ctx.fillRect(x + 15, y + 8, 3, 3);
-                this.ctx.fillRect(x + 24, y + 8, 3, 3);
+                // Common features
+                this.ctx.fillStyle = '#fff'; // Eye shine
+                this.ctx.fillRect(x + 13, y + 8, 1, 1);
+                this.ctx.fillRect(x + 19, y + 8, 1, 1);
                 
-                // Eye shine
-                this.ctx.fillStyle = '#fff';
-                this.ctx.fillRect(x + 16, y + 8, 1, 1);
-                this.ctx.fillRect(x + 25, y + 8, 1, 1);
-                
-                // Mouth (larger)
-                this.ctx.fillStyle = '#000';
-                this.ctx.fillRect(x + 19, y + 12, 4, 2);
+                this.ctx.fillStyle = '#000'; // Mouth
+                this.ctx.fillRect(x + 15, y + 12, 2, 1);
             }
             
             gameLoop(currentTime = 0) {
@@ -937,7 +673,7 @@
         }
         
         window.addEventListener('load', () => {
-            new Game();
+            new PokemonGame();
         });
     </script>
 </body>
