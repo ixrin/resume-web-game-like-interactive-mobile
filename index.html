@@ -10,10 +10,14 @@
             padding: 0;
             background: linear-gradient(135deg, #1a1a2e, #16213e);
             display: flex;
+            flex-direction: column;
             justify-content: center;
             align-items: center;
             min-height: 100vh;
             font-family: 'Courier New', monospace;
+            user-select: none;
+            -webkit-user-select: none;
+            -webkit-touch-callout: none;
         }
         
         #gameContainer {
@@ -22,6 +26,8 @@
             background: #000;
             border-radius: 8px;
             box-shadow: 0 0 20px rgba(74, 85, 104, 0.5);
+            max-width: 100vw;
+            max-height: 70vh;
         }
         
         #gameCanvas {
@@ -30,6 +36,8 @@
             image-rendering: -moz-crisp-edges;
             image-rendering: crisp-edges;
             border-radius: 4px;
+            max-width: 100%;
+            max-height: 100%;
         }
         
         #dialogBox {
@@ -48,6 +56,7 @@
             max-height: 200px;
             overflow-y: auto;
             box-shadow: 0 0 15px rgba(0, 0, 0, 0.8);
+            cursor: pointer;
         }
         
         #instructions {
@@ -61,14 +70,203 @@
             border-radius: 6px;
             border: 2px solid #4a5568;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+            z-index: 100;
+        }
+        
+        #touchControls {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-top: 20px;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+        
+        #dpad {
+            position: relative;
+            width: 120px;
+            height: 120px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 50%;
+            border: 2px solid #4a5568;
+        }
+        
+        .dpad-button {
+            position: absolute;
+            width: 40px;
+            height: 40px;
+            background: rgba(74, 85, 104, 0.8);
+            border: 2px solid #6a7b88;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 18px;
+            cursor: pointer;
+            user-select: none;
+            -webkit-user-select: none;
+            transition: all 0.1s;
+        }
+        
+        .dpad-button:active,
+        .dpad-button.pressed {
+            background: rgba(74, 85, 104, 1);
+            transform: scale(0.95);
+            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+        
+        #dpad-up {
+            top: 5px;
+            left: 40px;
+        }
+        
+        #dpad-down {
+            bottom: 5px;
+            left: 40px;
+        }
+        
+        #dpad-left {
+            top: 40px;
+            left: 5px;
+        }
+        
+        #dpad-right {
+            top: 40px;
+            right: 5px;
+        }
+        
+        #interactButton {
+            width: 80px;
+            height: 80px;
+            background: rgba(255, 107, 53, 0.8);
+            border: 3px solid #ff8b55;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 12px;
+            cursor: pointer;
+            user-select: none;
+            -webkit-user-select: none;
+            transition: all 0.1s;
+            text-align: center;
+            line-height: 1.2;
+        }
+        
+        #interactButton:active {
+            background: rgba(255, 107, 53, 1);
+            transform: scale(0.95);
+            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+        
+        /* Mobile responsive adjustments */
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+            
+            #gameContainer {
+                width: 100%;
+                height: auto;
+                max-height: 60vh;
+            }
+            
+            #gameCanvas {
+                width: 100%;
+                height: auto;
+            }
+            
+            #instructions {
+                font-size: 10px;
+                padding: 8px;
+                top: 10px;
+                left: 10px;
+                max-width: calc(100% - 40px);
+            }
+            
+            #dialogBox {
+                font-size: 12px;
+                padding: 15px;
+                bottom: 10px;
+                left: 10px;
+                right: 10px;
+                max-height: 150px;
+            }
+            
+            #touchControls {
+                margin-top: 15px;
+                gap: 15px;
+            }
+            
+            #dpad {
+                width: 100px;
+                height: 100px;
+            }
+            
+            .dpad-button {
+                width: 35px;
+                height: 35px;
+                font-size: 16px;
+            }
+            
+            #dpad-up {
+                top: 5px;
+                left: 32.5px;
+            }
+            
+            #dpad-down {
+                bottom: 5px;
+                left: 32.5px;
+            }
+            
+            #dpad-left {
+                top: 32.5px;
+                left: 5px;
+            }
+            
+            #dpad-right {
+                top: 32.5px;
+                right: 5px;
+            }
+            
+            #interactButton {
+                width: 70px;
+                height: 70px;
+                font-size: 10px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            #gameContainer {
+                max-height: 50vh;
+            }
+            
+            #touchControls {
+                flex-direction: column;
+                gap: 10px;
+            }
         }
     </style>
 </head>
 <body>
     <div id="gameContainer">
         <canvas id="gameCanvas" width="1152" height="864"></canvas>
-        <div id="instructions">Use WASD or Arrow Keys to move • Space to interact</div>
+        <div id="instructions">Use controls below to move • Touch to interact</div>
         <div id="dialogBox" id="dialog"></div>
+    </div>
+    
+    <div id="touchControls">
+        <div id="dpad">
+            <div id="dpad-up" class="dpad-button">↑</div>
+            <div id="dpad-down" class="dpad-button">↓</div>
+            <div id="dpad-left" class="dpad-button">←</div>
+            <div id="dpad-right" class="dpad-button">→</div>
+        </div>
+        <div id="interactButton">TALK</div>
     </div>
 
     <script>
@@ -78,8 +276,12 @@
                 this.ctx = this.canvas.getContext('2d');
                 this.ctx.imageSmoothingEnabled = false;
                 
-                this.tileSize = 48; // Bigger tiles (48x48) for environment
-                this.characterSize = 32; // Characters are 32x32 for realistic scale
+                // Make canvas responsive
+                this.resizeCanvas();
+                window.addEventListener('resize', () => this.resizeCanvas());
+                
+                this.tileSize = 48;
+                this.characterSize = 32;
                 this.mapWidth = 32;
                 this.mapHeight = 24;
                 
@@ -93,6 +295,7 @@
                 
                 this.camera = { x: 0, y: 0 };
                 this.keys = {};
+                this.touchKeys = {}; // For touch controls
                 this.lastTime = 0;
                 this.animTimer = 0;
                 this.moveTimer = 0;
@@ -104,7 +307,94 @@
                 this.initializeMap();
                 this.initializeNPCs();
                 this.setupControls();
+                this.setupTouchControls();
                 this.gameLoop();
+            }
+            
+            resizeCanvas() {
+                const container = document.getElementById('gameContainer');
+                const canvas = this.canvas;
+                
+                // Calculate scale to fit screen while maintaining aspect ratio
+                const maxWidth = Math.min(window.innerWidth - 40, 1152);
+                const maxHeight = Math.min(window.innerHeight * 0.6, 864);
+                
+                const scaleX = maxWidth / 1152;
+                const scaleY = maxHeight / 864;
+                const scale = Math.min(scaleX, scaleY);
+                
+                canvas.style.width = (1152 * scale) + 'px';
+                canvas.style.height = (864 * scale) + 'px';
+                
+                container.style.width = (1152 * scale) + 'px';
+                container.style.height = (864 * scale) + 'px';
+            }
+            
+            setupTouchControls() {
+                // D-pad controls
+                const dpadUp = document.getElementById('dpad-up');
+                const dpadDown = document.getElementById('dpad-down');
+                const dpadLeft = document.getElementById('dpad-left');
+                const dpadRight = document.getElementById('dpad-right');
+                const interactButton = document.getElementById('interactButton');
+                
+                // Touch events for movement
+                this.setupDirectionalButton(dpadUp, 'ArrowUp');
+                this.setupDirectionalButton(dpadDown, 'ArrowDown');
+                this.setupDirectionalButton(dpadLeft, 'ArrowLeft');
+                this.setupDirectionalButton(dpadRight, 'ArrowRight');
+                
+                // Interact button
+                this.setupInteractButton(interactButton);
+                
+                // Canvas touch for interaction (tap to talk)
+                this.canvas.addEventListener('touchstart', (e) => {
+                    e.preventDefault();
+                    this.handleInteraction();
+                });
+                
+                // Prevent context menu on long press
+                this.canvas.addEventListener('contextmenu', (e) => {
+                    e.preventDefault();
+                });
+            }
+            
+            setupDirectionalButton(button, keyCode) {
+                const handleStart = (e) => {
+                    e.preventDefault();
+                    this.touchKeys[keyCode] = true;
+                    button.classList.add('pressed');
+                };
+                
+                const handleEnd = (e) => {
+                    e.preventDefault();
+                    this.touchKeys[keyCode] = false;
+                    button.classList.remove('pressed');
+                };
+                
+                // Mouse events
+                button.addEventListener('mousedown', handleStart);
+                button.addEventListener('mouseup', handleEnd);
+                button.addEventListener('mouseleave', handleEnd);
+                
+                // Touch events
+                button.addEventListener('touchstart', handleStart);
+                button.addEventListener('touchend', handleEnd);
+                button.addEventListener('touchcancel', handleEnd);
+                
+                // Prevent context menu
+                button.addEventListener('contextmenu', (e) => e.preventDefault());
+            }
+            
+            setupInteractButton(button) {
+                const handleInteract = (e) => {
+                    e.preventDefault();
+                    this.handleInteraction();
+                };
+                
+                button.addEventListener('touchstart', handleInteract);
+                button.addEventListener('mousedown', handleInteract);
+                button.addEventListener('contextmenu', (e) => e.preventDefault());
             }
             
             initializeMap() {
@@ -169,6 +459,11 @@
                 this.dialogBox.addEventListener('click', () => {
                     this.hideDialog();
                 });
+                
+                this.dialogBox.addEventListener('touchstart', (e) => {
+                    e.preventDefault();
+                    this.hideDialog();
+                });
             }
             
             handleInteraction() {
@@ -213,25 +508,26 @@
                 let moving = false;
                 
                 if (this.moveTimer >= this.moveDelay) {
-                    if (this.keys['KeyW'] || this.keys['ArrowUp']) {
+                    // Check both keyboard and touch controls
+                    if (this.keys['KeyW'] || this.keys['ArrowUp'] || this.touchKeys['ArrowUp']) {
                         newY--;
                         this.player.facing = 'up';
                         moving = true;
                         this.moveTimer = 0;
                     }
-                    if (this.keys['KeyS'] || this.keys['ArrowDown']) {
+                    if (this.keys['KeyS'] || this.keys['ArrowDown'] || this.touchKeys['ArrowDown']) {
                         newY++;
                         this.player.facing = 'down';
                         moving = true;
                         this.moveTimer = 0;
                     }
-                    if (this.keys['KeyA'] || this.keys['ArrowLeft']) {
+                    if (this.keys['KeyA'] || this.keys['ArrowLeft'] || this.touchKeys['ArrowLeft']) {
                         newX--;
                         this.player.facing = 'left';
                         moving = true;
                         this.moveTimer = 0;
                     }
-                    if (this.keys['KeyD'] || this.keys['ArrowRight']) {
+                    if (this.keys['KeyD'] || this.keys['ArrowRight'] || this.touchKeys['ArrowRight']) {
                         newX++;
                         this.player.facing = 'right';
                         moving = true;
